@@ -1,0 +1,7 @@
+huggingface-hub
+kafka-python
+mysql-connector-python
+paho-mqtt
+pymongo
+python-dotenv
+transformers
