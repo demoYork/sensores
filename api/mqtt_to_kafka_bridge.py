@@ -3,12 +3,12 @@ from kafka import KafkaProducer
 import json
 
 # MQTT configuration
-MQTT_BROKER_HOST = "10.90.43.165"
+MQTT_BROKER_HOST = "10.90.41.137"
 MQTT_BROKER_PORT = 1883
 MQTT_TOPIC = "esp32/data"
 
 # Kafka configuration
-KAFKA_BROKER_HOST = "10.90.43.165:9092"  # Dirección de tu broker Kafka
+KAFKA_BROKER_HOST = "10.90.41.137:9092"  # Dirección de tu broker Kafka
 KAFKA_TOPIC = "esp32_raw_data"  # El tópico donde quieres enviar los datos
 
 # Run callback when client to connect with MQTT Broker

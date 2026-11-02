@@ -5,3 +5,5 @@ paho-mqtt
 pymongo
 python-dotenv
 transformers
+regex
+numpy<2.0.0

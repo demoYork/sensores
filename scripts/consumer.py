@@ -4,11 +4,10 @@ import json
 import pymongo
 
 # Kafka configuration
-bootstrap_servers = '10.90.43.165:9092'
+bootstrap_servers = '10.90.41.137:9092'
 topic_name = 'esp32_raw_data'
 
 # MongoDB configuration
-#conex = pymongo.MongoClient(host=[MongoDB + ':27017'])
 conex = pymongo.MongoClient(host=['127.0.0.1:27017'], username='admin', password='parda99*')
 db = conex.esp32_data
 
@@ -24,7 +23,7 @@ consumer = KafkaConsumer(
 try:
     for message in consumer:
         # Extract data from message
-        deviceID = message.value['topic'].split(';')[0]
+        deviceID = message.value['payload'].split(';')[0]
         ambientLight = message.value['payload'].split(';')[1]
         temperature = message.value['payload'].split(';')[2]
 
@@ -41,7 +40,7 @@ try:
                 'status': 'received',
                 'timestamp': datetime.datetime.now()
             })
-        except pymongo.errors.PyMongoError as e:
+        except Exception as e:
             print(f"Error al guardar en MongoDB: {e}")
 
 except KeyboardInterrupt:

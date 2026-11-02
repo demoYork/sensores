@@ -3,11 +3,9 @@ from transformers import pipeline
 import time
 import mysql.connector
 
-
 # Initialize the Hugging Face text classifier
 # The 'distilbert-base-uncased' model is lightweight and fast
 classifier = pipeline("zero-shot-classification", model="facebook/bart-large-mnli")
-
 
 # Define the classification labels for temperature and light level
 labels1 = ["high", "medium", "low"]
@@ -23,16 +21,10 @@ def predict_temperature(temperature):
         # Call the Hugging Face classifier to classify the temperature
         classification = classifier(text, labels1)
 
-        # Print result
-        #print("Resultado de la clasificación")
-        #print(f"Temperatura: {temperature}°C")
-        #print(f"Nivel de temperatura: {classification['labels'][0]}")
-        #print(f"Confianza: {classification['scores'][0]:.2f}")
-        #print("-" * 30)
-
         return classification
     except Exception as e:
         print(f"Error procesando el mensaje: {e}")
+
 
 # Callback para manejar los mensajes MQTT entrantes
 def predict_light(light):
@@ -43,13 +35,6 @@ def predict_light(light):
 
         # Clasificar la temperatura usando el modelo de Hugging Face
         classification = classifier(text, labels2)
-
-        # Print result
-        #print("Resultado de la clasificación")
-        #print(f"Lumines: {light}")
-        #print(f"Nivel de lumines: {classification['labels'][0]}")
-        #print(f"Confianza: {classification['scores'][0]:.2f}")
-        #print("-" * 30)
 
         return classification
     except Exception as e:
@@ -70,6 +55,7 @@ mycursor = mydb.cursor()
 def insert_into_mysql(doc_id, device_id, ll, cllight, lt, cltemp):
     sql = "INSERT INTO esp32(doc_id, device_id, light_lvl, class_light, temperature, class_temp) VALUES (%s, %s, %s, %s, %s, %s)"
     val = (doc_id, device_id, ll, cllight, lt, cltemp)
+    print(val)
     mycursor.execute(sql, val)
     mydb.commit()
 
@@ -77,9 +63,7 @@ def insert_into_mysql(doc_id, device_id, ll, cllight, lt, cltemp):
 # ----------------------------------------------------------------------------------------------
 # MongoDB configuration
 # This configuration connects to a MongoDB instance running on localhost at port 27017.
-# It uses the 'sentimientos' database and the 'sentiment_messages' collection.
 # ----------------------------------------------------------------------------------------------
-#conex = pymongo.MongoClient(host=[MongoDB + ':27017'])
 conex = pymongo.MongoClient(host=['127.0.0.1:27017'], username='admin', password='parda99*')
 db = conex.esp32_data
 
@@ -96,7 +80,8 @@ def process_documents():
         print(f"Predicted temperature: {temperature}")
 
         # call the function to insert the document into MySQL
-        insert_into_mysql(str(doc["_id"]), doc["device_id"], int(doc["light_level"]),  light['labels'][0], float(doc["temperature_level"]), temperature['labels'][0])
+        insert_into_mysql(str(doc["_id"]), doc["device_id"], int(doc["light_level"]), light['labels'][0], float(doc["temperature_level"]),
+                          temperature['labels'][0])
 
         db.sensores.update_one(
             {"_id": doc["_id"]},
@@ -105,6 +90,7 @@ def process_documents():
 
     # Apply a delay of the 5 seconds to avoid overwhelming the database with requests
     time.sleep(5)
+
 
 # Main loop to continuously process documents
 while True:
